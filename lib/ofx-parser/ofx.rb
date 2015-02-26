@@ -50,7 +50,7 @@ module OfxParser
   class Ofx
     attr_accessor :header, :sign_on, :signup_account_info,
                   :bank_accounts, :credit_accounts,
-                  :investment_accounts
+                  :investment_accounts, :option_positions, :stock_positions
 
     def accounts
       [ bank_accounts, credit_accounts, investment_accounts ].flatten!.compact!
@@ -196,6 +196,11 @@ module OfxParser
 
   class Institute
     attr_accessor :name, :id
+  end
+
+  class Position
+    attr_accessor :security_id, :security_id_type, :account, :type,
+      :units, :unit_price, :market_value, :price_date, :memo
   end
 
 end

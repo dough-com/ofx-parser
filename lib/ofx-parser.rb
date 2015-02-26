@@ -80,6 +80,8 @@ module OfxParser
       # Investments (?)
       #build_investment((doc/"SIGNONMSGSRQV1"))
 
+      build_investment_positions((doc/"INVSTMTMSGSRSV1/INVSTMTTRNRS/INVSTMTRS/INVPOSLIST"), ofx)
+
       ofx
     end
 
@@ -175,6 +177,33 @@ module OfxParser
 
     def self.build_investment(doc)
 
+    end
+
+    def self.build_investment_positions(doc, ofx)
+      ofx.option_positions = (doc/"POSOPT").collect do |op|
+        build_investment_position(op)
+      end
+
+      ofx.stock_positions = (doc/"POSSTOCK").collect do |sp|
+        build_investment_position(sp)
+      end
+    end
+
+    def self.build_investment_position(p)
+      position = Position.new
+
+      position.security_id = (p/"SECID/UNIQUEID").inner_text
+      position.security_id_type = (p/"SECID/UNIQUEIDTYPE").inner_text
+
+      position.account = (p/"HELDINACCT").inner_text
+      position.type = (p/"POSTYPE").inner_text
+      position.units = (p/"UNITS").inner_text
+      position.unit_price = (p/"UNITPRICE").inner_text
+      position.market_value = (p/"MKTVAL").inner_text
+      position.price_date = parse_datetime((p/"DTPRICEASOF").inner_text)
+      position.memo = (p/"MEMO").inner_text
+
+      position
     end
 
     def self.build_status(doc)

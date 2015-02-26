@@ -448,6 +448,34 @@ class OfxParserTest < MiniTest::Unit::TestCase
     assert_includes doc.header, "VERSION", "header should still be parsed"
   end
 
+  def test_investment_positions
+    ofx = OfxParser::OfxParser.parse(OFX_FILES[:investment_positions])
+
+    assert_equal 13, ofx.stock_positions.length
+    stock_position = ofx.stock_positions.first
+    assert_equal "AU000000IBK3", stock_position.security_id
+    assert_equal "ISIN", stock_position.security_id_type
+    assert_equal "CASH", stock_position.account
+    assert_equal "LONG", stock_position.type
+    assert_equal "50", stock_position.units
+    assert_equal "36.65", stock_position.unit_price
+    assert_equal "1832.5", stock_position.market_value
+    assert_kind_of DateTime, stock_position.price_date
+    assert_equal "", stock_position.memo
+
+    assert_equal 2, ofx.option_positions.length
+    option_position = ofx.option_positions.first
+    assert_equal "91915995", option_position.security_id
+    assert_equal "CONID", option_position.security_id_type
+    assert_equal "CASH", option_position.account
+    assert_equal "SHORT", option_position.type
+    assert_equal "-20", option_position.units
+    assert_equal "0.006", option_position.unit_price
+    assert_equal "-12", option_position.market_value
+    assert_kind_of DateTime, option_position.price_date
+    assert_equal "", option_position.memo
+  end
+
   class X
     include OfxParser::MonetarySupport
     extend OfxParser::MonetaryClassSupport
